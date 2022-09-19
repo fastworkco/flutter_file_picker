@@ -386,6 +386,10 @@ didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls{
     NSMutableArray<NSURL *> * urls = [[NSMutableArray alloc] initWithCapacity:results.count];
     
     self.group = dispatch_group_create();
+
+    if(self->_eventSink != nil) {
+        self->_eventSink([NSNumber numberWithBool:YES]);
+    }
     
     for (PHPickerResult *result in results) {
         dispatch_group_enter(_group);
@@ -424,6 +428,9 @@ didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls{
     
     dispatch_group_notify(_group, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^{
         self->_group = nil;
+        if(self->_eventSink != nil) {
+            self->_eventSink([NSNumber numberWithBool:NO]);
+        }
         [self handleResult:urls];
     });
 }
